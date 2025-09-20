@@ -8,10 +8,10 @@ import localFont from "next/font/local";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s • Edify",
-    default: "Edify",
+    template: "%s • Edu Organize",
+    default: "Edu Organize",
   },
-  description: "epp",
+  description: "eduorganize",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
