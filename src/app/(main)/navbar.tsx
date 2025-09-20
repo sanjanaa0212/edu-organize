@@ -1,9 +1,13 @@
 import { UserDropdown } from "@/components/common/user-dropdown";
+import { getServerAuth } from "@/server/auth/server-sess";
 import Image from "next/image";
 import Link from "next/link";
 
-export function Navbar() {
-  // TODO: Display logged-in user
+export async function Navbar() {
+  const sess = await getServerAuth();
+  const user = sess?.user;
+
+  if (!user) return null;
 
   return (
     <header className="bg-background border-b">
@@ -20,7 +24,7 @@ export function Navbar() {
         </Link>
         <div className="flex items-center gap-2">
           {/* <ModeToggle /> */}
-          <UserDropdown />
+          <UserDropdown user={user} />
         </div>
       </div>
     </header>

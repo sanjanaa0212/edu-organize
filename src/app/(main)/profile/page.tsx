@@ -3,13 +3,18 @@ import { EmailForm } from "./email-form";
 import { LogoutEverywhereButton } from "./logout-everywhere-button";
 import { PasswordForm } from "./password-form";
 import { ProfileDetailsForm } from "./profile-details-form";
+import { getServerAuth } from "@/server/auth/server-sess";
+import { unauthorized } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Profile",
 };
 
-export default function ProfilePage() {
-  // TODO: Check for authentication
+export default async function ProfilePage() {
+  const sess = await getServerAuth();
+  const user = sess?.user;
+
+  if (!user) return unauthorized();
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-12">

@@ -12,6 +12,9 @@ const config = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    authInterrupts: true,
+  },
 };
 
 export default config;

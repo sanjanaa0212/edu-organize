@@ -1,7 +1,12 @@
-import { ReactNode } from "react";
+import { getServerAuth } from "@/server/auth/server-sess";
+import { redirect } from "next/navigation";
+import { type ReactNode } from "react";
 
-export default function AuthLayout({ children }: { children: ReactNode }) {
-  // TODO: Redirect already logged-in users
+export default async function AuthLayout({ children }: { children: ReactNode }) {
+  const sess = await getServerAuth();
+  const user = sess?.user;
 
-  return children;
+  if (user) redirect("/dashboard");
+
+  return <>{children}</>;
 }

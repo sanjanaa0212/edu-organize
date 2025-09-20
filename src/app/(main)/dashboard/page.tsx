@@ -6,13 +6,20 @@ import { format } from "date-fns";
 import { CalendarDaysIcon, MailIcon, ShieldIcon, UserIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getServerAuth } from "@/server/auth/server-sess";
+import { unauthorized } from "next/navigation";
+import type { User } from "@/server/auth/config";
 
 export const metadata: Metadata = {
   title: "Dashboard",
 };
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
   // TODO: Check for authentication
+  const sess = await getServerAuth();
+  const user = sess?.user;
+
+  if (!user) unauthorized();
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-12">
@@ -21,23 +28,15 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-semibold">Dashboard</h1>
           <p className="text-muted-foreground">Welcome back! Here&apos;s your account overview.</p>
         </div>
-        {/* TODO: Use actual user data */}
-        <EmailVerificationAlert />
-        <ProfileInformation />
+        {!user.emailVerified && <EmailVerificationAlert />}
+        <ProfileInformation user={user} />
       </div>
     </main>
   );
 }
 
-function ProfileInformation() {
+function ProfileInformation({ user }: { user: User }) {
   // TODO: Render real user info
-  const user = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    image: undefined,
-    role: "admin",
-    createdAt: new Date(),
-  };
 
   return (
     <Card>
