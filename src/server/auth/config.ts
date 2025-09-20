@@ -14,7 +14,7 @@ export const auth = betterAuth({
       role: { type: "string", input: false },
     },
   },
-  trustedOrigins: ["http://localhost:3001"],
+  trustedOrigins: ["http://localhost:3001", "https://edu-organize.vercel.app"],
 });
 
 export type Session = typeof auth.$Infer.Session;
