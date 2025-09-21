@@ -9,6 +9,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { authClient } from "@/server/auth";
+import { toast } from "sonner";
 
 const updatePasswordSchema = z.object({
   currentPassword: z.string().min(1, { message: "Current password is required" }),
@@ -31,6 +33,12 @@ export function PasswordForm() {
 
   async function onSubmit({ currentPassword, newPassword }: UpdatePasswordValues) {
     // TODO: Handle password update
+    const { error } = await authClient.changePassword({ currentPassword, newPassword });
+    if (error) {
+      toast.error(error?.message ?? "Failed to update password");
+    } else {
+      toast.success("Password updated successfully !");
+    }
   }
 
   const loading = form.formState.isSubmitting;

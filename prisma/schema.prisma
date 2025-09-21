@@ -11,27 +11,99 @@ datasource db {
 }
 
 model User {
-    id            String    @id
-    name          String
-    email         String
-    emailVerified Boolean
-    image         String?
-    role          String?
-    createdAt     DateTime
-    updatedAt     DateTime
-    sessions      Session[]
-    accounts      Account[]
+    id        String   @id @default(cuid())
+    name      String
+    email     String?
+    phone     String
+    image     String?
+    role      String?
+    gender    String
+    dob       DateTime
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-    @@unique([email])
+    organizationId String?
+    organization   Organization? @relation(fields: [organizationId], references: [id])
+
+    departmentId String?
+    department   Department? @relation(fields: [departmentId], references: [id])
+
+    classId String?
+    class   Class?  @relation("ClassStudents", fields: [classId], references: [id])
+
+    teachingSubjects Subject[] @relation("TeacherSubjects")
+
+    classTeacherOf Class[] @relation("ClassTeacher")
+
+    crOf Class[] @relation("CR")
+
+    timetable Timetable[]
+
+    assignments Assignment[] @relation("TeacherAssignments")
+
+    submissions Submission[]
+
+    studyMaterials StudyMaterial[]
+
+    doubts Doubt[]
+
+    doubtMessages DoubtMessage[]
+
+    sessions Session[]
+    accounts Account[]
+
     @@map("user")
 }
 
+model Organization {
+    id        String   @id @default(cuid())
+    name      String
+    email     String
+    phone     String?
+    address   String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    users       User[]
+    departments Department[]
+    magicLinks  MagicLink[]
+}
+
+model Department {
+    id             String       @id @default(cuid())
+    name           String
+    organizationId String
+    organization   Organization @relation(fields: [organizationId], references: [id])
+
+    magicLink MagicLink[]
+
+    teachers  User[]
+    classes   Class[]
+    semesters Semester[]
+}
+
+model MagicLink {
+    id String @id @default(cuid())
+
+    token String @unique
+
+    role           String
+    organizationId String
+    organization   Organization @relation(fields: [organizationId], references: [id])
+
+    departmentId String?
+    department   Department? @relation(fields: [departmentId], references: [id])
+
+    expiresAt DateTime
+    createdAt DateTime @default(now())
+}
+
 model Session {
-    id        String   @id
+    id        String   @id @default(cuid())
     expiresAt DateTime
     token     String
-    createdAt DateTime
-    updatedAt DateTime
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
     ipAddress String?
     userAgent String?
     userId    String
@@ -42,7 +114,7 @@ model Session {
 }
 
 model Account {
-    id                    String    @id
+    id                    String    @id @default(cuid())
     accountId             String
     providerId            String
     userId                String
@@ -54,19 +126,164 @@ model Account {
     refreshTokenExpiresAt DateTime?
     scope                 String?
     password              String?
-    createdAt             DateTime
-    updatedAt             DateTime
+    createdAt             DateTime  @default(now())
+    updatedAt             DateTime  @updatedAt
 
     @@map("account")
 }
 
-model Verification {
-    id         String    @id
-    identifier String
-    value      String
-    expiresAt  DateTime
-    createdAt  DateTime?
-    updatedAt  DateTime?
+model Class {
+    id      String @id @default(cuid())
+    name    String
+    year    Int
+    section String
 
-    @@map("verification")
+    departmentId String
+    department   Department @relation(fields: [departmentId], references: [id])
+
+    semesterId String
+    semester   Semester @relation(fields: [semesterId], references: [id])
+
+    students User[]    @relation("ClassStudents")
+    subjects Subject[]
+
+    classTeacherId String?
+    classTeacher   User?   @relation("ClassTeacher", fields: [classTeacherId], references: [id])
+
+    crId String?
+    cr   User?   @relation("CR", fields: [crId], references: [id])
+
+    Timetable Timetable[]
+}
+
+model Semester {
+    id   String @id @default(cuid())
+    name String
+    year Int
+
+    departmentId String
+    department   Department @relation(fields: [departmentId], references: [id])
+
+    subjects Subject[]
+    classes  Class[]
+}
+
+model Subject {
+    id         String   @id @default(cuid())
+    name       String
+    type       String
+    semesterId String
+    semester   Semester @relation(fields: [semesterId], references: [id])
+
+    classes Class[]
+    doubts  Doubt[]
+
+    teachers    User[]          @relation("TeacherSubjects")
+    chapters    Chapter[]
+    materials   StudyMaterial[]
+    assignments Assignment[]    @relation("SubjectAssignments")
+    Timetables  Timetable[]
+}
+
+model Chapter {
+    id        String  @id @default(cuid())
+    title     String
+    subjectId String
+    subject   Subject @relation(fields: [subjectId], references: [id])
+    topics    Topic[]
+}
+
+model Topic {
+    id        String          @id @default(cuid())
+    title     String
+    status    String
+    chapterId String
+    chapter   Chapter         @relation(fields: [chapterId], references: [id])
+    doubts    Doubt[]
+    materials StudyMaterial[]
+}
+
+model Timetable {
+    id        String   @id @default(cuid())
+    classId   String
+    class     Class    @relation(fields: [classId], references: [id])
+    subjectId String
+    subject   Subject  @relation(fields: [subjectId], references: [id])
+    teacherId String
+    teacher   User     @relation(fields: [teacherId], references: [id])
+    dayOfWeek Int
+    startTime DateTime
+    endTime   DateTime
+}
+
+model Assignment {
+    id          String       @id @default(cuid())
+    title       String
+    dueDate     DateTime
+    subjectId   String
+    subject     Subject      @relation("SubjectAssignments", fields: [subjectId], references: [id])
+    teacherId   String
+    teacher     User         @relation("TeacherAssignments", fields: [teacherId], references: [id])
+    files       File[]       @relation("AssignmentFiles")
+    submissions Submission[]
+}
+
+model Submission {
+    id           String     @id @default(cuid())
+    assignmentId String
+    assignment   Assignment @relation(fields: [assignmentId], references: [id])
+    studentId    String
+    student      User       @relation(fields: [studentId], references: [id])
+    files        File[]     @relation("SubmissionFiles")
+    submittedAt  DateTime
+}
+
+model StudyMaterial {
+    id           String   @id @default(cuid())
+    title        String
+    type         String
+    subjectId    String?
+    subject      Subject? @relation(fields: [subjectId], references: [id])
+    topicId      String?
+    topic        Topic?   @relation(fields: [topicId], references: [id])
+    uploadedById String
+    uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+    files        File[]   @relation("StudyMaterialsFiles")
+}
+
+model Doubt {
+    id        String  @id @default(cuid())
+    question  String
+    studentId String
+    student   User    @relation(fields: [studentId], references: [id])
+    topicId   String?
+    topic     Topic?  @relation(fields: [topicId], references: [id])
+
+    subjectId String?
+    subject   Subject? @relation(fields: [subjectId], references: [id])
+
+    message DoubtMessage[]
+}
+
+model DoubtMessage {
+    id        String   @id @default(cuid())
+    doubtId   String
+    doubt     Doubt    @relation(fields: [doubtId], references: [id])
+    senderId  String
+    sender    User     @relation(fields: [senderId], references: [id])
+    content   String
+    createdAt DateTime @default(now())
+    files     File[]   @relation("DoubtMessageFiles")
+}
+
+model File {
+    id        String   @id @default(cuid())
+    url       String
+    type      String?
+    createdAt DateTime @default(now())
+
+    studyMaterials  StudyMaterial[] @relation("StudyMaterialsFiles")
+    submissions     Submission[]    @relation("SubmissionFiles")
+    doubtMessages   DoubtMessage[]  @relation("DoubtMessageFiles")
+    assignmentFiles Assignment[]    @relation("AssignmentFiles")
 }

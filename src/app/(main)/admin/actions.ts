@@ -14,5 +14,7 @@ export async function deleteApplication() {
 
   // Delete app...
 
+  // const { error } = await authClient.deleteUser({ callbackURL: "/" });
+
   await setTimeout(800);
 }

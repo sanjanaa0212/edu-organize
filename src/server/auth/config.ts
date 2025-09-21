@@ -10,7 +10,7 @@ export const auth = betterAuth({
     enabled: true,
   },
   rateLimit: {
-    window: 60,
+    window: 100,
     max: 100,
   },
   user: {

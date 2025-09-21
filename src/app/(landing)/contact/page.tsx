@@ -1,7 +1,5 @@
 "use client";
 
-// import { GitHubIcon } from "@/components/icons/GitHubIcon";
-// import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { LoadingButton } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,15 +16,23 @@ import { z } from "zod";
 import { authClient } from "@/server/auth";
 import { toast } from "sonner";
 
-const signInSchema = z.object({
+export default function Page() {
+  return (
+    <main className="flex min-h-svh items-center justify-center px-4">
+      <ContactForm />
+    </main>
+  );
+}
+
+const contactSchema = z.object({
+  name: z.string().min(1, { message: "Name is required" }),
   email: z.string().email({ message: "Please enter a valid email" }),
-  password: z.string().min(1, { message: "Password is required" }),
-  rememberMe: z.boolean().optional(),
+  phone: z.string().min(1, { message: "Phone is required" }).max(10, { message: "Enter valid phone number" }),
 });
 
-type SignInValues = z.infer<typeof signInSchema>;
+type SignInValues = z.infer<typeof contactSchema>;
 
-export function SignInForm() {
+export function ContactForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,50 +40,49 @@ export function SignInForm() {
   const searchParams = useSearchParams();
 
   const form = useForm<SignInValues>({
-    resolver: zodResolver(signInSchema),
+    resolver: zodResolver(contactSchema),
     defaultValues: {
       email: "",
-      password: "",
-      rememberMe: false,
+      phone: "",
+      name: "",
     },
   });
 
-  async function onSubmit({ email, password, rememberMe }: SignInValues) {
+  async function onSubmit({ email, name, phone }: SignInValues) {
     // TODO: Handle sign in
     setError(null);
     setLoading(true);
 
-    const { error } = await authClient.signIn.email({
-      email,
-      password,
-      rememberMe,
-    });
+    console.log({ email, name, phone });
 
     setLoading(false);
-
-    if (error) {
-      setError(error?.message ?? "Something went wrong");
-    } else {
-      toast.success("Signin success");
-      router.push("/dashboard");
-    }
-  }
-
-  async function handleSocialSignIn(provider: "google" | "github") {
-    // TODO: Handle social sign in
   }
 
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle className="text-lg md:text-xl">Sign In</CardTitle>
-        <CardDescription className="text-xs md:text-sm">
-          Enter your email below to login to your account
-        </CardDescription>
+        <CardTitle className="text-lg md:text-xl">Contact us</CardTitle>
+        <CardDescription className="text-xs md:text-sm">We&apos;ll reach out to you soon !</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center">
+                    <FormLabel>Name</FormLabel>
+                  </div>
+                  <FormControl>
+                    <Input placeholder="Name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="email"
@@ -94,32 +99,14 @@ export function SignInForm() {
 
             <FormField
               control={form.control}
-              name="password"
+              name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <div className="flex items-center">
-                    <FormLabel>Password</FormLabel>
-                    {/* <Link href="/forgot-password" className="ml-auto inline-block text-sm underline">
-                      Forgot your password?
-                    </Link> */}
-                  </div>
+                  <FormLabel>Phone</FormLabel>
                   <FormControl>
-                    <PasswordInput autoComplete="current-password" placeholder="Password" {...field} />
+                    <Input type="number" maxLength={10} placeholder="9876540231" {...field} />
                   </FormControl>
                   <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="rememberMe"
-              render={({ field }) => (
-                <FormItem className="flex items-center gap-2">
-                  <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                  </FormControl>
-                  <FormLabel>Remember me</FormLabel>
                 </FormItem>
               )}
             />
@@ -131,7 +118,7 @@ export function SignInForm() {
             )}
 
             <LoadingButton type="submit" className="w-full" loading={loading}>
-              Login
+              Submit
             </LoadingButton>
           </form>
         </Form>

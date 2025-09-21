@@ -1,6 +1,5 @@
 import { UserDropdown } from "@/components/common/user-dropdown";
 import { getServerAuth } from "@/server/auth/server-sess";
-import Image from "next/image";
 import Link from "next/link";
 
 export async function Navbar() {
@@ -13,7 +12,7 @@ export async function Navbar() {
     <header className="bg-background border-b">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-          <Image
+          <img
             src={"/media/coding_in_flow_logo.jpg"}
             alt="Coding in Flow logo"
             width={32}
