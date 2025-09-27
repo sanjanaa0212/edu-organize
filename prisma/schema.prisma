@@ -11,16 +11,17 @@ datasource db {
 }
 
 model User {
-    id        String   @id @default(cuid())
-    name      String
-    email     String?
-    phone     String
-    image     String?
-    role      String?
-    gender    String
-    dob       DateTime
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    id            String    @id @default(cuid())
+    name          String
+    email         String?
+    phone         String?
+    image         String?
+    role          String?
+    gender        String?
+    dob           DateTime?
+    emailVerified Boolean
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
 
     organizationId String?
     organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -61,12 +62,15 @@ model Organization {
     email     String
     phone     String?
     address   String?
+    logo      String?
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     users       User[]
     departments Department[]
     magicLinks  MagicLink[]
+
+    @@map("organization")
 }
 
 model Department {
@@ -80,6 +84,8 @@ model Department {
     teachers  User[]
     classes   Class[]
     semesters Semester[]
+
+    @@map("department")
 }
 
 model MagicLink {
@@ -96,6 +102,8 @@ model MagicLink {
 
     expiresAt DateTime
     createdAt DateTime @default(now())
+
+    @@map("magic_link")
 }
 
 model Session {
@@ -154,6 +162,8 @@ model Class {
     cr   User?   @relation("CR", fields: [crId], references: [id])
 
     Timetable Timetable[]
+
+    @@map("class")
 }
 
 model Semester {
@@ -166,6 +176,8 @@ model Semester {
 
     subjects Subject[]
     classes  Class[]
+
+    @@map("semester")
 }
 
 model Subject {
@@ -183,6 +195,8 @@ model Subject {
     materials   StudyMaterial[]
     assignments Assignment[]    @relation("SubjectAssignments")
     Timetables  Timetable[]
+
+    @@map("subject")
 }
 
 model Chapter {
@@ -191,6 +205,8 @@ model Chapter {
     subjectId String
     subject   Subject @relation(fields: [subjectId], references: [id])
     topics    Topic[]
+
+    @@map("chapter")
 }
 
 model Topic {
@@ -201,6 +217,8 @@ model Topic {
     chapter   Chapter         @relation(fields: [chapterId], references: [id])
     doubts    Doubt[]
     materials StudyMaterial[]
+
+    @@map("topic")
 }
 
 model Timetable {
@@ -214,6 +232,8 @@ model Timetable {
     dayOfWeek Int
     startTime DateTime
     endTime   DateTime
+
+    @@map("timetable")
 }
 
 model Assignment {
@@ -226,6 +246,8 @@ model Assignment {
     teacher     User         @relation("TeacherAssignments", fields: [teacherId], references: [id])
     files       File[]       @relation("AssignmentFiles")
     submissions Submission[]
+
+    @@map("assignment")
 }
 
 model Submission {
@@ -236,6 +258,8 @@ model Submission {
     student      User       @relation(fields: [studentId], references: [id])
     files        File[]     @relation("SubmissionFiles")
     submittedAt  DateTime
+
+    @@map("submission")
 }
 
 model StudyMaterial {
@@ -249,6 +273,8 @@ model StudyMaterial {
     uploadedById String
     uploadedBy   User     @relation(fields: [uploadedById], references: [id])
     files        File[]   @relation("StudyMaterialsFiles")
+
+    @@map("study_material")
 }
 
 model Doubt {
@@ -263,6 +289,8 @@ model Doubt {
     subject   Subject? @relation(fields: [subjectId], references: [id])
 
     message DoubtMessage[]
+
+    @@map("doubt")
 }
 
 model DoubtMessage {
@@ -274,6 +302,8 @@ model DoubtMessage {
     content   String
     createdAt DateTime @default(now())
     files     File[]   @relation("DoubtMessageFiles")
+
+    @@map("doubt_message")
 }
 
 model File {
@@ -286,4 +316,6 @@ model File {
     submissions     Submission[]    @relation("SubmissionFiles")
     doubtMessages   DoubtMessage[]  @relation("DoubtMessageFiles")
     assignmentFiles Assignment[]    @relation("AssignmentFiles")
+
+    @@map("file")
 }

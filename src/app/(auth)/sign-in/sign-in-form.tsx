@@ -1,22 +1,18 @@
 "use client";
 
-// import { GitHubIcon } from "@/components/icons/GitHubIcon";
-// import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { LoadingButton } from "@/components/ui/button";
-import { PasswordInput } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Input, PasswordInput } from "@/components/ui/input";
+import { authClient } from "@/server/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { authClient } from "@/server/auth";
 import { toast } from "sonner";
+import { z } from "zod";
 
 const signInSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email" }),
@@ -31,7 +27,6 @@ export function SignInForm() {
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const form = useForm<SignInValues>({
     resolver: zodResolver(signInSchema),
@@ -61,10 +56,6 @@ export function SignInForm() {
       toast.success("Signin success");
       router.push("/dashboard");
     }
-  }
-
-  async function handleSocialSignIn(provider: "google" | "github") {
-    // TODO: Handle social sign in
   }
 
   return (
@@ -99,9 +90,6 @@ export function SignInForm() {
                 <FormItem>
                   <div className="flex items-center">
                     <FormLabel>Password</FormLabel>
-                    {/* <Link href="/forgot-password" className="ml-auto inline-block text-sm underline">
-                      Forgot your password?
-                    </Link> */}
                   </div>
                   <FormControl>
                     <PasswordInput autoComplete="current-password" placeholder="Password" {...field} />
