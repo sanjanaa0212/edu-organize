@@ -28,7 +28,7 @@ export default async function ProfilePage() {
             <ProfileDetailsForm user={user} />
           </div>
           <div className="flex-1 space-y-6">
-            <EmailForm currentEmail="john.doe@example.com" />
+            <EmailForm currentEmail={user.email} />
             <PasswordForm />
             <LogoutEverywhereButton />
           </div>

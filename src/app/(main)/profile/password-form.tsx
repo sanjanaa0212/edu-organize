@@ -51,7 +51,6 @@ export function PasswordForm() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-            {/* OAuth users (without a password) can use the "forgot password" flow */}
             <FormField
               control={form.control}
               name="currentPassword"
