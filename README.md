@@ -13,11 +13,14 @@
 1. **Org Signup / Contact Flow**
    - [x] Create a **“Contact Us / Add Your Org” page** (basic form → persists org request in DB).
    - [x] As super admin (you), manually approve & create organization entry in DB.
-   - [ ] Generate **credentials** (temporary admin login) for that org.
+   - [x] Generate **credentials** (temporary admin login) for that org.
+     - [x] create org
+     - [x] create admin for that org
+     - [x] delete org
 
 2. **DB Updates**
-   - [ ] `Organization` model (id, name, email, contact info).
-   - [ ] `User` model links to `organizationId`.
+   - [x] `Organization` model (id, name, email, contact info).
+   - [x] `User` model links to `organizationId`.
    - [ ] `Department`, `Class`, `Subject` later link to `organizationId`.
 
 ---
